@@ -48,8 +48,8 @@ export async function POST(request: NextRequest) {
 
     const buyerEquity = buyerProperty.equity
 
-    // 4. Generate offer structures using AI
-    const offers = generateOffers({
+    // 4. Generate offer structures using AI (with Claude API integration)
+    const offers = await generateOffers({
       property: property as Property,
       buyerEquity,
       match: match as Match,

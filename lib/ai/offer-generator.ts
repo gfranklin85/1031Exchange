@@ -1,4 +1,5 @@
 import type { Property, Match, OfferStructure } from '@/lib/types/database.types'
+import { generateCreativeOffers, isClaudeAvailable } from './claude-client'
 
 interface OfferGenerationParams {
   property: Property
@@ -13,8 +14,9 @@ interface OfferGenerationParams {
 /**
  * Generate multiple offer structures automatically
  * Each offer is a complete financial package
+ * Uses Claude API for creative offers if available
  */
-export function generateOffers(params: OfferGenerationParams): OfferStructure[] {
+export async function generateOffers(params: OfferGenerationParams): Promise<OfferStructure[]> {
   const { property, buyerEquity, match, marketData } = params
 
   const closingCostPercent = marketData?.avgClosingCostPercent || 0.02 // 2% default
@@ -35,6 +37,46 @@ export function generateOffers(params: OfferGenerationParams): OfferStructure[] 
   // Offer 4: Value Arbitrage (if property has operational upside)
   const valueArbitrageOffer = generateValueArbitrageOffer(property, buyerEquity, closingCostPercent, match)
   if (valueArbitrageOffer) offers.push(valueArbitrageOffer)
+
+  // Offer 5+: Claude-generated creative structures (if API available)
+  if (isClaudeAvailable() && match) {
+    try {
+      const creativeOffers = await generateCreativeOffers({
+        property,
+        buyerEquity,
+        matchScore: match.fit_score || 75,
+      })
+
+      // Convert Claude's creative offers to our format
+      for (const creativeOffer of creativeOffers) {
+        offers.push({
+          type: creativeOffer.type,
+          title: creativeOffer.title,
+          structure: {
+            price: creativeOffer.structure.price,
+            downPayment: creativeOffer.structure.downPayment,
+            financing: creativeOffer.structure.price - creativeOffer.structure.downPayment,
+            closeDays: creativeOffer.structure.closeDays,
+            contingencies: [creativeOffer.structure.uniqueTerms],
+          },
+          sellerNet: {
+            grossProceeds: creativeOffer.structure.price,
+            loanPayoff: property.current_debt,
+            closingCosts: creativeOffer.structure.price * closingCostPercent,
+            netCash:
+              creativeOffer.structure.price -
+              property.current_debt -
+              creativeOffer.structure.price * closingCostPercent,
+            boot: 0,
+          },
+          reasoning: creativeOffer.reasoning,
+        })
+      }
+    } catch (error) {
+      console.error('Claude creative offers failed:', error)
+      // Continue with standard offers
+    }
+  }
 
   return offers
 }

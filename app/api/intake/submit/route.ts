@@ -101,8 +101,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to fetch properties' }, { status: 500 })
     }
 
-    // 4. Run AI matching engine
-    const matches = findMatches(
+    // 4. Run AI matching engine (now with Claude API integration)
+    const matches = await findMatches(
       property as Property,
       criteria as ReplacementCriteria,
       (availableProperties || []) as Property[],
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
 
         if (seekerProperty) {
           // Check if our new property matches their criteria
-          const scores = findMatches(
+          const scores = await findMatches(
             seekerProperty as Property,
             seeker as ReplacementCriteria,
             [property as Property],

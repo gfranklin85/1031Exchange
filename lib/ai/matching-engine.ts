@@ -1,4 +1,5 @@
 import type { Property, ReplacementCriteria, Match } from '@/lib/types/database.types'
+import { generateMatchReasoning as generateClaudeMatchReasoning, isClaudeAvailable } from './claude-client'
 
 interface FitScoreComponents {
   equityMatch: number
@@ -138,13 +139,31 @@ export function calculateFitScore(
 
 /**
  * Generate human-readable reasoning for why this is a good match
+ * Uses Claude API if available, falls back to rule-based reasoning
  */
-export function generateMatchReasoning(
+export async function generateMatchReasoning(
   relinquishedProperty: Property,
   replacementProperty: Property,
   criteria: ReplacementCriteria,
   scores: FitScoreComponents
-): MatchWithDetails['reasoning'] {
+): Promise<MatchWithDetails['reasoning']> {
+  // Try Claude API first if available
+  if (isClaudeAvailable()) {
+    try {
+      const claudeReasoning = await generateClaudeMatchReasoning({
+        relinquishedProperty,
+        replacementProperty,
+        criteria,
+        scores,
+      })
+      return claudeReasoning
+    } catch (error) {
+      console.error('Claude reasoning failed, using fallback:', error)
+      // Fall through to rule-based reasoning
+    }
+  }
+
+  // Fallback: Rule-based reasoning
   const keyBenefits: string[] = []
   const considerations: string[] = []
 
@@ -273,12 +292,12 @@ export function calculateBoot(
  * Find all matches for a given property
  * Returns top N matches sorted by fit score
  */
-export function findMatches(
+export async function findMatches(
   relinquishedProperty: Property,
   criteria: ReplacementCriteria,
   availableProperties: Property[],
   topN: number = 7
-): MatchWithDetails[] {
+): Promise<MatchWithDetails[]> {
   const matches: MatchWithDetails[] = []
 
   for (const replacementProperty of availableProperties) {
@@ -300,8 +319,8 @@ export function findMatches(
     // Calculate boot
     const boot = calculateBoot(relinquishedProperty, replacementProperty)
 
-    // Generate reasoning
-    const reasoning = generateMatchReasoning(relinquishedProperty, replacementProperty, criteria, scores)
+    // Generate reasoning (async - will use Claude if available)
+    const reasoning = await generateMatchReasoning(relinquishedProperty, replacementProperty, criteria, scores)
 
     matches.push({
       id: '', // Will be generated when saved to DB
