@@ -17,11 +17,12 @@ interface AddressAutocompleteProps {
 
 /**
  * Google Places Autocomplete for address entry
- * Auto-fills city, state, zip from selected address
+ * Falls back to manual entry if Google Places fails to load
  */
 export default function AddressAutocomplete({ onAddressSelect, initialValue }: AddressAutocompleteProps) {
   const inputRef = useRef<HTMLInputElement>(null)
   const [address, setAddress] = useState(initialValue || '')
+  const [useManualEntry, setUseManualEntry] = useState(false)
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY!,
@@ -83,12 +84,42 @@ export default function AddressAutocomplete({ onAddressSelect, initialValue }: A
     })
   }, [isLoaded, onAddressSelect])
 
-  if (loadError) {
+  // Show manual entry if Google Places fails or user chooses manual
+  if (loadError || useManualEntry) {
     return (
-      <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-lg">
-        <p className="text-red-400 text-sm">
-          Error loading Google Places. Check your API key or enter address manually.
-        </p>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <label className="block text-sm font-medium">Street Address</label>
+          {loadError && (
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+              className="text-xs text-blue-400 hover:text-blue-300"
+            >
+              Retry Google Places
+            </button>
+          )}
+        </div>
+        <input
+          type="text"
+          value={address}
+          onChange={(e) => {
+            setAddress(e.target.value)
+            onAddressSelect({
+              address: e.target.value,
+              city: '',
+              state: '',
+              zip: '',
+            })
+          }}
+          placeholder="123 Main Street"
+          className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
+        />
+        {loadError && (
+          <p className="text-xs text-yellow-400">
+            Google Places unavailable. Using manual entry. (Check billing in Google Cloud Console)
+          </p>
+        )}
       </div>
     )
   }
@@ -103,7 +134,16 @@ export default function AddressAutocomplete({ onAddressSelect, initialValue }: A
 
   return (
     <div>
-      <label className="block text-sm font-medium mb-2">Street Address</label>
+      <div className="flex items-center justify-between mb-2">
+        <label className="block text-sm font-medium">Street Address</label>
+        <button
+          type="button"
+          onClick={() => setUseManualEntry(true)}
+          className="text-xs text-gray-400 hover:text-gray-300"
+        >
+          Use manual entry
+        </button>
+      </div>
       <div className="relative">
         <input
           ref={inputRef}
