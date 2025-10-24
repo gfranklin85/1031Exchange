@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { PropertyIntakeForm, PropertyType } from '@/lib/types/database.types'
+import SmartNumberInput from './SmartNumberInput'
+import AddressAutocomplete from './AddressAutocomplete'
 
 const PROPERTY_TYPES: { value: PropertyType; label: string; description: string }[] = [
   { value: 'multifamily', label: 'Multifamily', description: 'Apartments, duplexes, triplexes' },
@@ -136,65 +138,64 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
             </div>
           )}
 
-          {/* Step 2: Location */}
+          {/* Step 2: Location with Google Places Autocomplete */}
           {step === 2 && (
             <div className="space-y-6">
               <div>
                 <h2 className="text-3xl font-bold mb-2">Where is the property located?</h2>
-                <p className="text-gray-400">We'll use this for market analysis</p>
+                <p className="text-gray-400">Start typing the address - we'll auto-fill the rest</p>
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Street Address</label>
-                  <input
-                    type="text"
-                    value={formData.address || ''}
-                    onChange={(e) => updateFormData({ address: e.target.value })}
-                    placeholder="123 Main Street"
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                  />
-                </div>
+                {/* Google Places Autocomplete */}
+                <AddressAutocomplete
+                  initialValue={formData.address}
+                  onAddressSelect={(addressData) => {
+                    updateFormData({
+                      address: addressData.address,
+                      city: addressData.city,
+                      state: addressData.state,
+                      zip: addressData.zip,
+                    })
+                  }}
+                />
 
-                <div className="grid md:grid-cols-2 gap-4">
+                {/* City, State, ZIP (auto-filled from Google Places) */}
+                <div className="grid md:grid-cols-3 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">City</label>
                     <input
                       type="text"
                       value={formData.city || ''}
                       onChange={(e) => updateFormData({ city: e.target.value })}
-                      placeholder="Fresno"
+                      placeholder="Auto-filled"
                       className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
                     />
                   </div>
 
                   <div>
                     <label className="block text-sm font-medium mb-2">State</label>
-                    <select
+                    <input
+                      type="text"
                       value={formData.state || ''}
                       onChange={(e) => updateFormData({ state: e.target.value })}
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                    >
-                      <option value="">Select state</option>
-                      {STATES.map((state) => (
-                        <option key={state} value={state}>
-                          {state}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Auto-filled"
+                      maxLength={2}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none uppercase"
+                    />
                   </div>
-                </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">ZIP Code (optional)</label>
-                  <input
-                    type="text"
-                    value={formData.zip || ''}
-                    onChange={(e) => updateFormData({ zip: e.target.value })}
-                    placeholder="93721"
-                    maxLength={5}
-                    className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                  />
+                  <div>
+                    <label className="block text-sm font-medium mb-2">ZIP Code</label>
+                    <input
+                      type="text"
+                      value={formData.zip || ''}
+                      onChange={(e) => updateFormData({ zip: e.target.value })}
+                      placeholder="Auto-filled"
+                      maxLength={5}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
