@@ -22,7 +22,24 @@ export async function POST(request: NextRequest) {
 
     if (profileError) {
       console.error('Profile creation error:', profileError)
+      // Check if it's a foreign key constraint error (auth user doesn't exist)
+      if (profileError.code === '23503') {
+        return NextResponse.json(
+          {
+            error: 'Database setup incomplete. Please run fix-for-testing.sql first.',
+            details: 'The profiles table still has a foreign key constraint to auth.users. Run the fix script from lib/supabase/fix-for-testing.sql'
+          },
+          { status: 500 }
+        )
+      }
       // If profile already exists, that's ok for this MVP
+      if (profileError.code !== '23505') { // 23505 = unique violation (already exists)
+        console.error('Unexpected profile error:', profileError)
+        return NextResponse.json(
+          { error: `Profile creation failed: ${profileError.message}`, details: profileError },
+          { status: 500 }
+        )
+      }
     }
 
     // 1. Create the relinquished property record
@@ -58,7 +75,15 @@ export async function POST(request: NextRequest) {
 
     if (propertyError) {
       console.error('Property creation error:', propertyError)
-      return NextResponse.json({ error: 'Failed to create property' }, { status: 500 })
+      return NextResponse.json(
+        {
+          error: 'Failed to create property',
+          details: propertyError.message,
+          hint: propertyError.hint,
+          code: propertyError.code
+        },
+        { status: 500 }
+      )
     }
 
     // 2. Create replacement criteria (what they want to buy)
