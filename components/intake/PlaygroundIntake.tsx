@@ -201,7 +201,7 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
             </div>
           )}
 
-          {/* Step 3: Financial Details */}
+          {/* Step 3: Financial Details with Smart Inputs */}
           {step === 3 && (
             <div className="space-y-6">
               <div>
@@ -211,33 +211,21 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
 
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Estimated Value</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-3 text-gray-400">$</span>
-                      <input
-                        type="number"
-                        value={formData.estimatedValue || ''}
-                        onChange={(e) => updateFormData({ estimatedValue: Number(e.target.value) })}
-                        placeholder="1,700,000"
-                        className="w-full pl-8 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
+                  <SmartNumberInput
+                    label="Estimated Value"
+                    value={formData.estimatedValue}
+                    onChange={(val) => updateFormData({ estimatedValue: val })}
+                    step={100000}
+                    helpText="Current market value of the property"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Current Debt</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-3 text-gray-400">$</span>
-                      <input
-                        type="number"
-                        value={formData.currentDebt || ''}
-                        onChange={(e) => updateFormData({ currentDebt: Number(e.target.value) })}
-                        placeholder="420,000"
-                        className="w-full pl-8 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                  </div>
+                  <SmartNumberInput
+                    label="Current Debt"
+                    value={formData.currentDebt}
+                    onChange={(val) => updateFormData({ currentDebt: val })}
+                    step={100000}
+                    helpText="Total mortgage/loan balance"
+                  />
                 </div>
 
                 {formData.estimatedValue && formData.currentDebt !== undefined && (
@@ -250,37 +238,21 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
                 )}
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">
-                      Monthly NOI (Net Operating Income)
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-3 text-gray-400">$</span>
-                      <input
-                        type="number"
-                        value={formData.monthlyNOI || ''}
-                        onChange={(e) => updateFormData({ monthlyNOI: Number(e.target.value) })}
-                        placeholder="8,500"
-                        className="w-full pl-8 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Gross rent - expenses (not including debt service)</p>
-                  </div>
+                  <SmartNumberInput
+                    label="Monthly NOI (Net Operating Income)"
+                    value={formData.monthlyNOI}
+                    onChange={(val) => updateFormData({ monthlyNOI: val })}
+                    step={1000}
+                    helpText="Gross rent - expenses (not including debt service)"
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Annual Operating Expenses</label>
-                    <div className="relative">
-                      <span className="absolute left-4 top-3 text-gray-400">$</span>
-                      <input
-                        type="number"
-                        value={formData.annualExpenses || ''}
-                        onChange={(e) => updateFormData({ annualExpenses: Number(e.target.value) })}
-                        placeholder="48,000"
-                        className="w-full pl-8 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                      />
-                    </div>
-                    <p className="text-xs text-gray-500 mt-1">Property tax, insurance, utilities, maintenance</p>
-                  </div>
+                  <SmartNumberInput
+                    label="Annual Operating Expenses"
+                    value={formData.annualExpenses}
+                    onChange={(val) => updateFormData({ annualExpenses: val })}
+                    step={10000}
+                    helpText="Property tax, insurance, utilities, maintenance"
+                  />
                 </div>
 
                 {formData.monthlyNOI && formData.annualExpenses && (
@@ -307,46 +279,48 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
                 )}
 
                 <div className="grid md:grid-cols-3 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Door Count (optional)</label>
-                    <input
-                      type="number"
-                      value={formData.doorCount || ''}
-                      onChange={(e) => updateFormData({ doorCount: Number(e.target.value) })}
-                      placeholder="12"
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
+                  <SmartNumberInput
+                    label="Door Count (optional)"
+                    value={formData.doorCount}
+                    onChange={(val) => updateFormData({ doorCount: val })}
+                    step={1}
+                    min={1}
+                    max={200}
+                    prefix=""
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Square Feet (optional)</label>
-                    <input
-                      type="number"
-                      value={formData.squareFeet || ''}
-                      onChange={(e) => updateFormData({ squareFeet: Number(e.target.value) })}
-                      placeholder="9600"
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
+                  <SmartNumberInput
+                    label="Square Feet (optional)"
+                    value={formData.squareFeet}
+                    onChange={(val) => updateFormData({ squareFeet: val })}
+                    step={1000}
+                    min={500}
+                    prefix=""
+                  />
 
-                  <div>
-                    <label className="block text-sm font-medium mb-2">Occupancy % (optional)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      max="100"
-                      value={formData.occupancyRate || ''}
-                      onChange={(e) => updateFormData({ occupancyRate: Number(e.target.value) })}
-                      placeholder="95"
-                      className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
+                  <SmartNumberInput
+                    label="Occupancy % (optional)"
+                    value={formData.occupancyRate}
+                    onChange={(val) => updateFormData({ occupancyRate: val })}
+                    step={5}
+                    min={0}
+                    max={100}
+                    prefix=""
+                    ranges={[
+                      { label: '', value: 75 },
+                      { label: '', value: 80 },
+                      { label: '', value: 85 },
+                      { label: '', value: 90 },
+                      { label: '', value: 95 },
+                      { label: '', value: 100 },
+                    ]}
+                  />
                 </div>
               </div>
             </div>
           )}
 
-          {/* Step 4: Tax Basis (Optional but Recommended) */}
+          {/* Step 4: Tax Basis with Smart Inputs */}
           {step === 4 && (
             <div className="space-y-6">
               <div>
@@ -355,35 +329,21 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
               </div>
 
               <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Original Purchase Price / Basis</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-gray-400">$</span>
-                    <input
-                      type="number"
-                      value={formData.originalBasis || ''}
-                      onChange={(e) => updateFormData({ originalBasis: Number(e.target.value) })}
-                      placeholder="600,000"
-                      className="w-full pl-8 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">What you paid + improvements</p>
-                </div>
+                <SmartNumberInput
+                  label="Original Purchase Price / Basis"
+                  value={formData.originalBasis}
+                  onChange={(val) => updateFormData({ originalBasis: val })}
+                  step={100000}
+                  helpText="What you paid + improvements"
+                />
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Depreciation Taken</label>
-                  <div className="relative">
-                    <span className="absolute left-4 top-3 text-gray-400">$</span>
-                    <input
-                      type="number"
-                      value={formData.depreciationTaken || ''}
-                      onChange={(e) => updateFormData({ depreciationTaken: Number(e.target.value) })}
-                      placeholder="180,000"
-                      className="w-full pl-8 pr-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:border-blue-500 focus:outline-none"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">Check your tax returns or ask your CPA</p>
-                </div>
+                <SmartNumberInput
+                  label="Depreciation Taken"
+                  value={formData.depreciationTaken}
+                  onChange={(val) => updateFormData({ depreciationTaken: val })}
+                  step={10000}
+                  helpText="Check your tax returns or ask your CPA"
+                />
 
                 {formData.originalBasis && formData.depreciationTaken !== undefined && (
                   <div className="p-4 bg-orange-500/10 border border-orange-500/30 rounded-lg">
