@@ -27,7 +27,9 @@ export default function IntakePage() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to submit property')
+        // Try to get detailed error message from API response
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        throw new Error(errorData.error || `HTTP ${response.status}: ${response.statusText}`)
       }
 
       const result = await response.json()
@@ -36,7 +38,10 @@ export default function IntakePage() {
       router.push(`/matches/${result.propertyId}`)
     } catch (err) {
       console.error('Intake submission error:', err)
-      setError(err instanceof Error ? err.message : 'Something went wrong')
+      const errorMessage = err instanceof Error ? err.message : 'Something went wrong'
+
+      // Show detailed error message
+      setError(`${errorMessage}\n\n💡 Have you set up Supabase yet? Check the README for setup instructions.`)
       setIsSubmitting(false)
     }
   }
@@ -52,7 +57,7 @@ export default function IntakePage() {
         {error && (
           <div className="max-w-3xl mx-auto mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400">
             <p className="font-semibold">Error submitting property:</p>
-            <p className="text-sm mt-1">{error}</p>
+            <p className="text-sm mt-1 whitespace-pre-line">{error}</p>
           </div>
         )}
 
