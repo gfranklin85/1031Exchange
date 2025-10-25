@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { PropertyIntakeForm, PropertyType } from '@/lib/types/database.types'
-import IPhoneNumberPicker from './iPhoneNumberPicker'
+import CleanNumberInput from './CleanNumberInput'
 import PolishedAddressAutocomplete from './PolishedAddressAutocomplete'
 
 const PROPERTY_TYPES: { value: PropertyType; label: string; description: string }[] = [
@@ -211,21 +211,17 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
 
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Estimated Value"
                     value={formData.estimatedValue || 0}
                     onChange={(val) => updateFormData({ estimatedValue: val })}
-                    step={100000}
-                    max={50000000}
                     helpText="Current market value of the property"
                   />
 
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Current Debt"
                     value={formData.currentDebt || 0}
                     onChange={(val) => updateFormData({ currentDebt: val })}
-                    step={100000}
-                    max={50000000}
                     helpText="Total mortgage/loan balance"
                   />
                 </div>
@@ -240,21 +236,17 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
                 )}
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Monthly NOI (Net Operating Income)"
                     value={formData.monthlyNOI || 0}
                     onChange={(val) => updateFormData({ monthlyNOI: val })}
-                    step={1000}
-                    max={500000}
                     helpText="Gross rent - expenses (not including debt service)"
                   />
 
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Annual Operating Expenses"
                     value={formData.annualExpenses || 0}
                     onChange={(val) => updateFormData({ annualExpenses: val })}
-                    step={10000}
-                    max={2000000}
                     helpText="Property tax, insurance, utilities, maintenance"
                   />
                 </div>
@@ -283,35 +275,26 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
                 )}
 
                 <div className="grid md:grid-cols-3 gap-4">
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Door Count (optional)"
                     value={formData.doorCount || 0}
                     onChange={(val) => updateFormData({ doorCount: val })}
-                    step={1}
-                    min={1}
-                    max={200}
                     prefix=""
                     suffix=" units"
                   />
 
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Square Feet (optional)"
                     value={formData.squareFeet || 0}
                     onChange={(val) => updateFormData({ squareFeet: val })}
-                    step={1000}
-                    min={500}
-                    max={500000}
                     prefix=""
                     suffix=" sq ft"
                   />
 
-                  <IPhoneNumberPicker
+                  <CleanNumberInput
                     label="Occupancy % (optional)"
                     value={formData.occupancyRate || 0}
                     onChange={(val) => updateFormData({ occupancyRate: val })}
-                    step={5}
-                    min={0}
-                    max={100}
                     prefix=""
                     suffix="%"
                   />
@@ -329,21 +312,17 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
               </div>
 
               <div className="space-y-4">
-                <IPhoneNumberPicker
+                <CleanNumberInput
                   label="Original Purchase Price / Basis"
                   value={formData.originalBasis || 0}
                   onChange={(val) => updateFormData({ originalBasis: val })}
-                  step={100000}
-                  max={50000000}
                   helpText="What you paid + improvements"
                 />
 
-                <IPhoneNumberPicker
+                <CleanNumberInput
                   label="Depreciation Taken"
                   value={formData.depreciationTaken || 0}
                   onChange={(val) => updateFormData({ depreciationTaken: val })}
-                  step={10000}
-                  max={5000000}
                   helpText="Check your tax returns or ask your CPA"
                 />
 
