@@ -6,6 +6,13 @@ import type { PropertyIntakeForm, Property, ReplacementCriteria } from '@/lib/ty
 export async function POST(request: NextRequest) {
   try {
     const formData: PropertyIntakeForm = await request.json()
+
+    // Debug logging
+    console.log('=== INTAKE SUBMIT API CALLED ===')
+    console.log('Supabase URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('Service key exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+    console.log('Service key length:', process.env.SUPABASE_SERVICE_ROLE_KEY?.length)
+
     const supabase = getServiceSupabase()
 
     // For MVP, create a temporary user ID (in production, use auth)
