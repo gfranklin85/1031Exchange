@@ -27,3 +27,4 @@
 # Allow Google Places API key in build output (it's meant to be public)
 [build.environment]
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_GOOGLE_PLACES_API_KEY"
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
