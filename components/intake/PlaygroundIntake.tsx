@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { PropertyIntakeForm, PropertyType } from '@/lib/types/database.types'
-import SmartNumberInput from './SmartNumberInput'
-import AddressAutocomplete from './AddressAutocomplete'
+import IPhoneNumberPicker from './iPhoneNumberPicker'
+import PolishedAddressAutocomplete from './PolishedAddressAutocomplete'
 
 const PROPERTY_TYPES: { value: PropertyType; label: string; description: string }[] = [
   { value: 'multifamily', label: 'Multifamily', description: 'Apartments, duplexes, triplexes' },
@@ -147,8 +147,8 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
               </div>
 
               <div className="space-y-4">
-                {/* Google Places Autocomplete */}
-                <AddressAutocomplete
+                {/* Polished Google Places Autocomplete */}
+                <PolishedAddressAutocomplete
                   initialValue={formData.address}
                   onAddressSelect={(addressData) => {
                     updateFormData({
@@ -211,19 +211,21 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
 
               <div className="space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Estimated Value"
-                    value={formData.estimatedValue}
+                    value={formData.estimatedValue || 0}
                     onChange={(val) => updateFormData({ estimatedValue: val })}
                     step={100000}
+                    max={50000000}
                     helpText="Current market value of the property"
                   />
 
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Current Debt"
-                    value={formData.currentDebt}
+                    value={formData.currentDebt || 0}
                     onChange={(val) => updateFormData({ currentDebt: val })}
                     step={100000}
+                    max={50000000}
                     helpText="Total mortgage/loan balance"
                   />
                 </div>
@@ -238,19 +240,21 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
                 )}
 
                 <div className="grid md:grid-cols-2 gap-4">
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Monthly NOI (Net Operating Income)"
-                    value={formData.monthlyNOI}
+                    value={formData.monthlyNOI || 0}
                     onChange={(val) => updateFormData({ monthlyNOI: val })}
                     step={1000}
+                    max={500000}
                     helpText="Gross rent - expenses (not including debt service)"
                   />
 
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Annual Operating Expenses"
-                    value={formData.annualExpenses}
+                    value={formData.annualExpenses || 0}
                     onChange={(val) => updateFormData({ annualExpenses: val })}
                     step={10000}
+                    max={2000000}
                     helpText="Property tax, insurance, utilities, maintenance"
                   />
                 </div>
@@ -279,41 +283,37 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
                 )}
 
                 <div className="grid md:grid-cols-3 gap-4">
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Door Count (optional)"
-                    value={formData.doorCount}
+                    value={formData.doorCount || 0}
                     onChange={(val) => updateFormData({ doorCount: val })}
                     step={1}
                     min={1}
                     max={200}
                     prefix=""
+                    suffix=" units"
                   />
 
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Square Feet (optional)"
-                    value={formData.squareFeet}
+                    value={formData.squareFeet || 0}
                     onChange={(val) => updateFormData({ squareFeet: val })}
                     step={1000}
                     min={500}
+                    max={500000}
                     prefix=""
+                    suffix=" sq ft"
                   />
 
-                  <SmartNumberInput
+                  <IPhoneNumberPicker
                     label="Occupancy % (optional)"
-                    value={formData.occupancyRate}
+                    value={formData.occupancyRate || 0}
                     onChange={(val) => updateFormData({ occupancyRate: val })}
                     step={5}
                     min={0}
                     max={100}
                     prefix=""
-                    ranges={[
-                      { label: '', value: 75 },
-                      { label: '', value: 80 },
-                      { label: '', value: 85 },
-                      { label: '', value: 90 },
-                      { label: '', value: 95 },
-                      { label: '', value: 100 },
-                    ]}
+                    suffix="%"
                   />
                 </div>
               </div>
@@ -329,19 +329,21 @@ export default function PlaygroundIntake({ onComplete, isSubmitting = false }: P
               </div>
 
               <div className="space-y-4">
-                <SmartNumberInput
+                <IPhoneNumberPicker
                   label="Original Purchase Price / Basis"
-                  value={formData.originalBasis}
+                  value={formData.originalBasis || 0}
                   onChange={(val) => updateFormData({ originalBasis: val })}
                   step={100000}
+                  max={50000000}
                   helpText="What you paid + improvements"
                 />
 
-                <SmartNumberInput
+                <IPhoneNumberPicker
                   label="Depreciation Taken"
-                  value={formData.depreciationTaken}
+                  value={formData.depreciationTaken || 0}
                   onChange={(val) => updateFormData({ depreciationTaken: val })}
                   step={10000}
+                  max={5000000}
                   helpText="Check your tax returns or ask your CPA"
                 />
 
